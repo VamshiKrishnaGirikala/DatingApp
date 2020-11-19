@@ -16,11 +16,10 @@ export class RegisterComponent implements OnInit {
   }
 
   register(): void {
-    console.log("reg", this.model);
     this.authService.register(this.model).subscribe(() => {
       console.log("registration successful");
     }, error => {
-        console.log(error); 
+        console.log(error);
     });
   }
 

@@ -1,37 +1,48 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
 import { map } from "rxjs/operators";
 import { JwtHelperService } from "@auth0/angular-jwt";
-import { Observable } from 'rxjs';
-import { JwtDecodeTokenModel } from 'src/app/models/jwt-decode-token.model';
-import { environment } from 'src/environments/environment';
+import { BehaviorSubject, Observable } from "rxjs";
+import { JwtDecodeTokenModel } from "src/app/models/jwt-decode-token.model";
+import { environment } from "src/environments/environment";
+import { User } from "src/app/models/user";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class AuthService {
   baseUrl = `${environment.apiUrl}auth/`;
   jwtHelper = new JwtHelperService();
   decodedToken: JwtDecodeTokenModel;
-  constructor(private http: HttpClient) { }
+  currentUser: User;
+  photoUrl = new BehaviorSubject<string>("../../../assets/images/user.png");
+  currentPhotoUrl = this.photoUrl.asObservable();
 
-  login (model: any):Observable<void>{
+  constructor(private http: HttpClient) {}
+
+  changeMemberPhoto(photoUrl: string) {
+    this.photoUrl.next(photoUrl);
+  }
+
+  login(model: any): Observable<void> {
     return this.http.post(`${this.baseUrl}login`, model).pipe(
       map((response: any) => {
         const user = response;
-        localStorage.setItem('token', user.token);
+        localStorage.setItem("token", user.token);
+        localStorage.setItem("user", JSON.stringify(user.user));
         this.decodedToken = this.jwtHelper.decodeToken(user.token);
-        console.log("token",this.decodedToken)
+        this.currentUser = user.user;
+        this.changeMemberPhoto(this.currentUser.photoUrl);
       })
-    )
+    );
   }
 
-  register(model:any):Observable<any> {
-   return this.http.post(`${this.baseUrl}register`, model);
+  register(model: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}register`, model);
   }
 
   loggedIn(): boolean {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     return !this.jwtHelper.isTokenExpired(token);
   }
 }

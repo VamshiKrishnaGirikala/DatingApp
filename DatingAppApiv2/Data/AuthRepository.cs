@@ -4,29 +4,38 @@ using DatingApp.API.Data;
 using DatingAppApiv2.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DatingAppApiv2.Data {
-    public class AuthRepository : IAuthRepository {
+namespace DatingAppApiv2.Data
+{
+    public class AuthRepository : IAuthRepository
+    {
         private readonly DataContext _context;
-        public AuthRepository (DataContext context) {
+        public AuthRepository(DataContext context)
+        {
             _context = context;
 
         }
-        public async Task<User> Login (string username, string password) {
-            var user = await _context.Users.FirstOrDefaultAsync (x => x.Username == username);
-            if (user == null) {
+        public async Task<User> Login(string username, string password)
+        {
+            var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(x => x.Username == username);
+            if (user == null)
+            {
                 return null;
             }
-            if (!verifyPasswordhash (password, user.PasswordHash, user.PasswordSalt))
+            if (!verifyPasswordhash(password, user.PasswordHash, user.PasswordSalt))
                 return null;
 
             return user;
         }
 
-        private bool verifyPasswordhash (string password, byte[] passwordHash, byte[] passwordSalt) {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512 (passwordSalt)) {
-                var computedHash = hmac.ComputeHash (System.Text.Encoding.UTF8.GetBytes (password)); //compute hash takes in the password as bytes 
-                for (int i = 0; i < computedHash.Length; i++) {
-                    if (computedHash[i] != passwordHash[i]) {
+        private bool verifyPasswordhash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password)); //compute hash takes in the password as bytes 
+                for (int i = 0; i < computedHash.Length; i++)
+                {
+                    if (computedHash[i] != passwordHash[i])
+                    {
                         return false;
                     }
                 }
@@ -34,27 +43,31 @@ namespace DatingAppApiv2.Data {
             }
         }
 
-        public async Task<User> Register (User user, string password) {
+        public async Task<User> Register(User user, string password)
+        {
             byte[] passwordHash, passwordSalt;
-            CreatePasswordHash (password, out passwordHash, out passwordSalt);
+            CreatePasswordHash(password, out passwordHash, out passwordSalt);
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
-            await _context.Users.AddAsync (user);
-            await _context.SaveChangesAsync ();
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
             return user;
         }
 
-        private void CreatePasswordHash (string password, out byte[] passwordHash, out byte[] passwordSalt) {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512 ()) {
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            {
                 passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash (System.Text.Encoding.UTF8.GetBytes (password)); //compute hash takes in the password as bytes 
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password)); //compute hash takes in the password as bytes 
             }
         }
 
-        public async Task<bool> UserExists (string username) {
-            if (await _context.Users.AnyAsync (x => x.Username == username))
+        public async Task<bool> UserExists(string username)
+        {
+            if (await _context.Users.AnyAsync(x => x.Username == username))
                 return true;
-            
+
             return false;
         }
     }

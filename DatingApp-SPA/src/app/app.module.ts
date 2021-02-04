@@ -4,14 +4,16 @@ import {
   HAMMER_GESTURE_CONFIG,
 } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
-import { HttpClientModule } from "@angular/common/http";
-import { FormsModule } from "@angular/forms";
+import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { BsDropdownModule } from "ngx-bootstrap/dropdown";
+import { BsDatepickerModule } from "ngx-bootstrap/datepicker";
 import { TabsModule } from "ngx-bootstrap/tabs";
 import { RouterModule } from "@angular/router";
 import { JwtModule } from "@auth0/angular-jwt";
 import { NgxGalleryModule } from "ngx-gallery";
+import { FileUploadModule } from "ng2-file-upload";
 
 import { AppComponent } from "./app.component";
 import { ValueComponent } from "./value/value.component";
@@ -26,9 +28,9 @@ import { MessagesComponent } from "./messages/messages.component";
 import { appRoutes } from "./routes";
 import { MemberCardComponent } from "./members/member-card/member-card.component";
 import { MemberDetailComponent } from "./members/member-detail/member-detail.component";
-import { MemberEditComponent } from './members/member-edit/member-edit.component';
-import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
-import { FileUploadModule } from "ng2-file-upload";
+import { MemberEditComponent } from "./members/member-edit/member-edit.component";
+import { PhotoEditorComponent } from "./members/photo-editor/photo-editor.component";
+import { JwtInterceptor } from "./_services/interceptors/jwt.interceptor";
 
 export function tokenGetter() {
   return localStorage.getItem("token");
@@ -61,10 +63,12 @@ export class CustomHammerConfig extends HammerGestureConfig {
     BrowserModule,
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     BrowserAnimationsModule,
     FileUploadModule,
     TabsModule.forRoot(),
     BsDropdownModule.forRoot(),
+    BsDatepickerModule.forRoot(),
     NgxGalleryModule,
     JwtModule.forRoot({
       config: {
@@ -78,6 +82,7 @@ export class CustomHammerConfig extends HammerGestureConfig {
     AuthService,
     ErrorInterceptorProvider,
     { provide: HAMMER_GESTURE_CONFIG, useClass: CustomHammerConfig },
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })

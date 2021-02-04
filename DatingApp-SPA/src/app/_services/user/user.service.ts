@@ -19,17 +19,17 @@ export class UserService {
     return this.http.get<User>(`${this.baseUrl}users/${id}`);
   }
 
-  updateUser(id: any, user: User) {
-    return this.http.put(`${this.baseUrl}users/${id}`, user);
+  updateUser(user: User) {
+    return this.http.put(`${this.baseUrl}users`, user);
   }
 
-  setMainPhoto(userId: string | number, id: number) {
-    const url = `${this.baseUrl}users/${userId}/photos/${id}/setMain`;
-    return this.http.post(url, {});
+  setMainPhoto( id: number) {
+    const url = `${this.baseUrl}users/set-main-photo/${id}`;
+    return this.http.put(url, {});
   }
 
   deletePhoto(userId: string | number, id: number) {
-    const url = `${this.baseUrl}users/${userId}/photos/${id}`;
+    const url = `${this.baseUrl}users/delete-photo/${id}`;
     return this.http.delete(url);
   }
 }

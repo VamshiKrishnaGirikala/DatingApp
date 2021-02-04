@@ -35,7 +35,7 @@ export class PhotoEditorComponent implements OnInit {
 
   private initializeUploader(): void {
     this.uploader = new FileUploader({
-      url: `${this.baseUrl}users/${this.authService.decodedToken.nameid}/photos`,
+      url: `${this.baseUrl}users/add-photo`,
       authToken: `Bearer ${localStorage.getItem("token")}`,
       isHTML5: true,
       allowedFileType: ["image"],
@@ -59,13 +59,21 @@ export class PhotoEditorComponent implements OnInit {
           isMain: res.isMain,
         };
         this.photos.push(photo);
+         if (photo.isMain) {
+           this.authService.changeMemberPhoto(photo.url);
+           this.authService.currentUser.photoUrl = photo.url;
+           localStorage.setItem(
+             "user",
+             JSON.stringify(this.authService.currentUser)
+           );
+         }
       }
     };
   }
 
   setMainPhoto(photo: Photo): void {
     this.userService
-      .setMainPhoto(this.authService.decodedToken.nameid, photo.id)
+      .setMainPhoto( photo.id)
       .subscribe(
         () => {
           this.currentMain = this.photos.filter(

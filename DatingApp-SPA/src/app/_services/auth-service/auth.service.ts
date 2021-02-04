@@ -11,7 +11,7 @@ import { User } from "src/app/models/user";
   providedIn: "root",
 })
 export class AuthService {
-  baseUrl = `${environment.apiUrl}auth/`;
+  baseUrl = `${environment.apiUrl}account/`;
   jwtHelper = new JwtHelperService();
   decodedToken: JwtDecodeTokenModel;
   currentUser: User;
@@ -29,15 +29,18 @@ export class AuthService {
       map((response: any) => {
         const user = response;
         localStorage.setItem("token", user.token);
-        localStorage.setItem("user", JSON.stringify(user.user));
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ user: user.username, photoUrl: user.photoUrl })
+        );
         this.decodedToken = this.jwtHelper.decodeToken(user.token);
-        this.currentUser = user.user;
+        this.currentUser = user;
         this.changeMemberPhoto(this.currentUser.photoUrl);
       })
     );
   }
 
-  register(model: any): Observable<any> {
+  register(model: User): Observable<any> {
     return this.http.post(`${this.baseUrl}register`, model);
   }
 

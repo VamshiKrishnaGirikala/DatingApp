@@ -9,6 +9,8 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { BsDropdownModule } from "ngx-bootstrap/dropdown";
 import { BsDatepickerModule } from "ngx-bootstrap/datepicker";
+import { ButtonsModule } from "ngx-bootstrap/buttons";
+import { PaginationModule } from "ngx-bootstrap/pagination";
 import { TabsModule } from "ngx-bootstrap/tabs";
 import { RouterModule } from "@angular/router";
 import { JwtModule } from "@auth0/angular-jwt";
@@ -31,6 +33,7 @@ import { MemberDetailComponent } from "./members/member-detail/member-detail.com
 import { MemberEditComponent } from "./members/member-edit/member-edit.component";
 import { PhotoEditorComponent } from "./members/photo-editor/photo-editor.component";
 import { JwtInterceptor } from "./_services/interceptors/jwt.interceptor";
+import { TimeAgoPipe } from "time-ago-pipe";
 
 export function tokenGetter() {
   return localStorage.getItem("token");
@@ -57,6 +60,7 @@ export class CustomHammerConfig extends HammerGestureConfig {
     MemberDetailComponent,
     MemberEditComponent,
     PhotoEditorComponent,
+    TimeAgoPipe
   ],
   imports: [
     RouterModule.forRoot(appRoutes),
@@ -69,6 +73,8 @@ export class CustomHammerConfig extends HammerGestureConfig {
     TabsModule.forRoot(),
     BsDropdownModule.forRoot(),
     BsDatepickerModule.forRoot(),
+    ButtonsModule.forRoot(),
+    PaginationModule.forRoot(),
     NgxGalleryModule,
     JwtModule.forRoot({
       config: {

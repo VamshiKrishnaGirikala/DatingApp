@@ -18,7 +18,7 @@ export class AuthService {
   photoUrl = new BehaviorSubject<string>("../../../assets/images/user.png");
   currentPhotoUrl = this.photoUrl.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   changeMemberPhoto(photoUrl: string) {
     this.photoUrl.next(photoUrl);
@@ -31,7 +31,7 @@ export class AuthService {
         localStorage.setItem("token", user.token);
         localStorage.setItem(
           "user",
-          JSON.stringify({ user: user.username, photoUrl: user.photoUrl })
+          JSON.stringify({ user: user.username, photoUrl: user.photoUrl, gender: user.gender, knownAs: user.knownAs })
         );
         this.decodedToken = this.jwtHelper.decodeToken(user.token);
         this.currentUser = user;
